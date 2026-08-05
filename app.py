@@ -22,8 +22,8 @@ for pkg, path in [
 
 stop_words = set(stopwords.words("english"))
 
-MODEL_PATH="/content/drive/MyDrive/wrenchwise/logistic_regression_model.joblib"
-VEC_PATH="/content/drive/MyDrive/wrenchwise/tfidf_vectorizer.joblib"
+MODEL_PATH="logistic_regression_model.joblib"
+VEC_PATH="tfidf_vectorizer.joblib"
 
 @st.cache_resource
 def load():
