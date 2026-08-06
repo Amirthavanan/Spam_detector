@@ -1,7 +1,8 @@
 # Spam Detection using Machine Learning
 
 An end-to-end NLP project built using Python, Scikit-learn, and Streamlit.
-
+<h3>Demo Link</h3>
+<a href="https://spamdetector-8qyvr52tavlfscigc5rhdn.streamlit.app/">Link</a>
 ## Features
 
 - Text Cleaning
