@@ -158,7 +158,7 @@ with col2:
 with col3:
     st.markdown("""
     <div class="metric">
-    <h2>Logistic Regression</h2>
+    <h2>Log Regression</h2>
     <p>ML Model</p>
     </div>
     """, unsafe_allow_html=True)
