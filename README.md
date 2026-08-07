@@ -3,7 +3,7 @@
 An end-to-end NLP project built using Python, Scikit-learn, and Streamlit.
 <h3>Demo Link</h3>
 <a href="https://spamdetector-bskx5deapqnxpghyywzvj8.streamlit.app/">Link</a>
-<br>
+
 ## Features
 
 - Text Cleaning
@@ -20,3 +20,7 @@ An end-to-end NLP project built using Python, Scikit-learn, and Streamlit.
 - NLTK
 - Streamlit
 - Joblib
+
+## Preview
+
+<img src="">
