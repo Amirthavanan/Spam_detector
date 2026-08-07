@@ -3,7 +3,15 @@ import joblib
 import nltk
 import streamlit as st
 from nltk.corpus import stopwords
+import nltk
 
+resources = [
+    "punkt",
+    "punkt_tab",
+    "stopwords",
+    "wordnet",
+    "omw-1.4"
+]
 st.set_page_config(
     page_title="Spam detector",
     page_icon="🤖",
