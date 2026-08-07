@@ -1,216 +1,119 @@
 import re
 import joblib
+import nltk
 import streamlit as st
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from nltk.corpus import stopwords
 
-# -------------------- PAGE CONFIG --------------------
 st.set_page_config(
-    page_title="Spam Detector",
+    page_title="Spam detector",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# -------------------- STOP WORDS --------------------
-stop_words = ENGLISH_STOP_WORDS
+for pkg, path in [
+    ("punkt","tokenizers/punkt"),
+    ("stopwords","corpora/stopwords")
+]:
+    try:
+        nltk.data.find(path)
+    except LookupError:
+        nltk.download(pkg)
 
-# -------------------- MODEL PATHS --------------------
-MODEL_PATH = "logistic_regression_model.joblib"
-VEC_PATH = "tfidf_vectorizer.joblib"
+stop_words = set(stopwords.words("english"))
 
-# -------------------- LOAD MODEL --------------------
+MODEL_PATH="/content/drive/MyDrive/wrenchwise/logistic_regression_model.joblib"
+VEC_PATH="/content/drive/MyDrive/wrenchwise/tfidf_vectorizer.joblib"
+
 @st.cache_resource
-def load_model():
-    model = joblib.load(MODEL_PATH)
-    vectorizer = joblib.load(VEC_PATH)
-    return model, vectorizer
+def load():
+    return joblib.load(MODEL_PATH), joblib.load(VEC_PATH)
 
-model, tfidf = load_model()
+model, tfidf = load()
 
-# -------------------- PREPROCESS --------------------
-def preprocess(text):
-    text = text.lower()
-    text = re.sub(r'[^a-z\s]', ' ', text)
+def preprocess(txt):
+    txt = re.sub(r"[^a-zA-Z\s]"," ",txt)
+    txt = " ".join(
+        w for w in nltk.word_tokenize(txt)
+        if w.lower() not in stop_words
+    )
+    return txt
 
-    words = [
-        word for word in text.split()
-        if word not in stop_words
-    ]
+def predict(msg):
+    x = tfidf.transform([preprocess(msg)])
+    pred = model.predict(x)[0]
+    proba = model.predict_proba(x)[0]
+    return ("Spam", float(proba[1])) if pred == 1 else ("Ham", float(proba[0]))
 
-    return " ".join(words)
-
-# -------------------- PREDICT --------------------
-def predict(message):
-    processed = preprocess(message)
-    vector = tfidf.transform([processed])
-
-    prediction = model.predict(vector)[0]
-    probability = model.predict_proba(vector)[0]
-
-    if prediction == 1:
-        return "Spam", probability[1]
-    else:
-        return "Ham", probability[0]
-
-# -------------------- CSS --------------------
 st.markdown("""
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
-
-html, body, [data-testid="stAppViewContainer"]{
+html,body,[data-testid="stAppViewContainer"]{
 background:linear-gradient(135deg,#0b1020,#18233d,#090d17);
-font-family:Arial,sans-serif;
+font-family:Poppins,sans-serif;
 color:white;
 }
-
-[data-testid="stHeader"]{
-background:transparent;
-}
-
-.block-container{
-max-width:1000px;
-padding-top:1rem;
-}
-
+[data-testid="stHeader"],[data-testid="stToolbar"]{background:transparent;}
+.block-container{padding-top:1rem;max-width:1000px;}
 .hero{
-padding:35px;
-border-radius:25px;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(15px);
-border:1px solid rgba(255,255,255,0.15);
+padding:35px;border-radius:28px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 10px 40px rgba(0,0,0,.35);
 text-align:center;
 margin-bottom:25px;
 }
-
 .metric{
-background:rgba(255,255,255,0.08);
-padding:20px;
-border-radius:18px;
-text-align:center;
+background:rgba(255,255,255,.07);
+padding:18px;border-radius:18px;text-align:center;
 }
-
-div.stButton > button{
-width:100%;
-height:60px;
-border:none;
-border-radius:35px;
-font-size:20px;
-font-weight:bold;
+div.stButton>button{
+width:100%;height:58px;border-radius:40px;
 background:linear-gradient(90deg,#7c3aed,#2563eb);
-color:white;
+color:white;font-weight:700;font-size:18px;border:none;
 }
-
 .result{
-padding:25px;
-border-radius:18px;
-font-size:22px;
-font-weight:bold;
-text-align:center;
-margin-top:20px;
+padding:25px;border-radius:20px;margin-top:20px;
+font-size:22px;font-weight:600;text-align:center;
 }
-
-.safe{
-background:#133d22;
-border:2px solid #22c55e;
-}
-
-.spam{
-background:#4b1111;
-border:2px solid #ef4444;
-}
-
-.footer{
-text-align:center;
-color:#bdbdbd;
-margin-top:30px;
-font-size:14px;
-}
-
+.safe{background:#163a23;border:1px solid #22c55e;}
+.spam{background:#4a1111;border:1px solid #ef4444;}
+.footer{text-align:center;color:#bbb;padding-top:30px;}
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------- HEADER --------------------
 st.markdown("""
 <div class="hero">
-<h1>🛡️ AI Spam Detector</h1>
-<p>SMS Spam Detection using Logistic Regression & TF-IDF</p>
+<h1><i class="fa-solid fa-shield-halved"></i> SPAM DETECTOR </h1>
+<p>Modern AI-powered SMS Spam Detection using Logistic Regression + TF-IDF</p>
 </div>
 """, unsafe_allow_html=True)
 
-# -------------------- METRICS --------------------
-col1, col2, col3 = st.columns(3)
+c1,c2,c3 = st.columns(3)
+with c1:
+    st.markdown('<div class="metric"><h3>97%+</h3><small>Accuracy</small></div>', unsafe_allow_html=True)
+with c2:
+    st.markdown('<div class="metric"><h3>TF-IDF</h3><small>Vectorizer</small></div>', unsafe_allow_html=True)
+with c3:
+    st.markdown('<div class="metric"><h3>Log Regression</h3><small>Model</small></div>', unsafe_allow_html=True)
 
-with col1:
-    st.markdown("""
-    <div class="metric">
-    <h2>97%</h2>
-    <p>Accuracy</p>
-    </div>
-    """, unsafe_allow_html=True)
+msg = st.text_area("📨 Enter SMS Message", height=180)
 
-with col2:
-    st.markdown("""
-    <div class="metric">
-    <h2>TF-IDF</h2>
-    <p>Vectorizer</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    st.markdown("""
-    <div class="metric">
-    <h2>Log Regression</h2>
-    <p>ML Model</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# -------------------- INPUT --------------------
-message = st.text_area(
-    "📨 Enter SMS Message",
-    height=180,
-    placeholder="Type or paste your SMS here..."
-)
-
-# -------------------- BUTTON --------------------
 if st.button("🚀 Detect Message"):
-
-    if message.strip() == "":
-        st.warning("Please enter a message.")
+    if msg.strip():
+        with st.spinner("Analyzing..."):
+            label, conf = predict(msg)
+        css = "spam" if label == "Spam" else "safe"
+        icon = "⚠️" if label == "Spam" else "✅"
+        st.markdown(f'<div class="result {css}">{icon} {label}<br><br>Confidence: {conf:.2%}</div>', unsafe_allow_html=True)
+        st.progress(conf)
     else:
+        st.warning("Please enter a message.")
 
-        with st.spinner("Analyzing message..."):
-            label, confidence = predict(message)
+st.markdown('<div class="footer">Streamlit • Amirthavanan</div>', unsafe_allow_html=True)
 
-        if label == "Spam":
-
-            st.markdown(
-                f"""
-                <div class="result spam">
-                ⚠️ SPAM MESSAGE
-                <br><br>
-                Confidence : {confidence:.2%}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        else:
-
-            st.markdown(
-                f"""
-                <div class="result safe">
-                ✅ SAFE MESSAGE
-                <br><br>
-                Confidence : {confidence:.2%}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.progress(confidence)
-
-# -------------------- FOOTER --------------------
-st.markdown("""
-<div class="footer">
-Streamlit | Logistic Regression | Scikit-Learn | Amirthavanan
-</div>
-""", unsafe_allow_html=True)
+# Save this as LOGR.py and run:
+# !streamlit run LOGR.py
