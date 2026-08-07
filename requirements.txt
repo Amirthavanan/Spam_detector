@@ -4,4 +4,4 @@ joblib
 numpy
 scipy
 pandas
-nltk
+nltk==3.8.1
