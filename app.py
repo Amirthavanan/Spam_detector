@@ -94,7 +94,7 @@ st.markdown("""
 
 c1,c2,c3 = st.columns(3)
 with c1:
-    st.markdown('<div class="metric"><h3>98%+</h3><small>Accuracy</small></div>', unsafe_allow_html=True)
+    st.markdown('<div class="metric"><h3>98%</h3><small>Accuracy</small></div>', unsafe_allow_html=True)
 with c2:
     st.markdown('<div class="metric"><h3>TF-IDF</h3><small>Vectorizer</small></div>', unsafe_allow_html=True)
 with c3:
