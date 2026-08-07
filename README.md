@@ -23,4 +23,4 @@ An end-to-end NLP project built using Python, Scikit-learn, and Streamlit.
 
 ## Preview
 
-<img src="">
+<img src="preview.png">
