@@ -2,7 +2,8 @@
 
 An end-to-end NLP project built using Python, Scikit-learn, and Streamlit.
 <h3>Demo Link</h3>
-<a href="https://spamdetector-bskx5deapqnxpghyywzvj8.streamlit.app/">Link</a></br>
+<a href="https://spamdetector-bskx5deapqnxpghyywzvj8.streamlit.app/">Link</a>
+<br>
 ## Features
 
 - Text Cleaning
